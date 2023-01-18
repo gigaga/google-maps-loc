@@ -3,11 +3,11 @@ const fs = require("fs");
 const fetch = require("sync-fetch");
 const json = require("big-json");
 
-const file1 = "/media/sf_D_DRIVE/Records.json";
-const file2 = "/media/sf_D_DRIVE/test2.txt";
+const file1 = process.argv[2];
+const file2 = process.argv[3];
 
-const MAX_TIME_INTERVAL_IN_MINUTES = 60;
-const MAX_DISTANCE_IN_METER = 1000;
+const MAX_TIME_INTERVAL_IN_MINUTES = 10;
+const MAX_DISTANCE_IN_METER = 500;
 const ENABLE_GEO_REVERSE = false;
 
 const POSITION_STACK_API_KEY = "";
@@ -80,7 +80,7 @@ Promise.all([promise1, promise2]).then(([obj1, obj2]) => {
       if (distance <= MAX_DISTANCE_IN_METER) {
         let address;
         const timeInterval = Math.abs(timestamp - obj1Timestamp) / 1000 / 60;
-        if (ENABLE_GEO_REVERSE) {
+        if (ENABLE_GEO_REVERSE && POSITION_STACK_API_KEY.length > 0) {
           const data = fetch(
             `http://api.positionstack.com/v1/reverse?access_key=${POSITION_STACK_API_KEY}&query=${obj1Lat},${obj1Lng}`,
             {
@@ -95,9 +95,9 @@ Promise.all([promise1, promise2]).then(([obj1, obj2]) => {
         }
 
         console.log(
-          `On ${new Date(
+          `Match on ${new Date(
             obj1Location.timestamp
-          ).toLocaleString()}, at ${Math.round(
+          ).toLocaleString()}: separated by ${Math.round(
             timeInterval
           )} minutes and ${Math.round(distance)} meters ${
             address ? `at ${address} (${lat}, ${lng})` : `(${lat}, ${lng})`
